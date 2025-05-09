@@ -1,0 +1,19 @@
+A-F - date event
+G - glucose_level
+H - finger_stick
+I - basal
+J - bolus
+K - sleep
+L - work
+M - stressors
+N - hypo_event
+O - illness
+P - exercise
+Q - basis_heart_rate
+R - basis_gsr
+S - basis_skin_temperature
+T - basis_air_temperature
+U - basis_step
+V - basis_sleep
+W - meal
+X - type of meal 1-Breakfast, 2-Lunch, 3-Dinner, 4-Snack, 5-HypoCorrection
