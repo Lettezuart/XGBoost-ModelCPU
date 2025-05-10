@@ -1,7 +1,6 @@
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
-
 import xgboost as xgb
 import numpy as np
 
@@ -46,17 +45,7 @@ def train_model(X_train, Y_train, X_test, Y_test):
         verbose=1,
         n_jobs=-1
     )
-    # RandomizedSearchCV automàtic
-    # random_search = RandomizedSearchCV(
-    #     estimator=model,
-    #     param_distributions=param_grid,
-    #     n_iter=300,  # Prova 100 combinacions aleatòries
-    #     scoring='neg_mean_squared_error',
-    #     cv=5,  # Més robust (abans era 3)
-    #     verbose=1,
-    #     random_state=42,
-    #     n_jobs=-1
-    # )
+
     grid_search.fit(X_train_scaled, Y_train_array)
 
     print(f"Millors paràmetres trobats: {grid_search.best_params_}")

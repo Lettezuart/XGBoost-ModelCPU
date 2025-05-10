@@ -1,8 +1,6 @@
 import pandas as pd
 import os
-from utils.filter import apply_kalman_to_all_data
 
-# Noms de les columnes
 column_names = [
     "year", "month", "day", "hour", "minute", "second", "glucose_level", "finger_stick", "basal", "bolus",
     "sleep", "work", "stressors", "hypo_event", "illness",
@@ -12,37 +10,27 @@ column_names = [
 
 def load_patient_data(base_path):
     """
-    Funció per carregar les dades dels pacients a partir de fitxers CSV.
-    Per cridar aquesta funció cal posar:
-
-    Args:
-        base_path = r'data/raw'  
-        
-    Returns:
-       test_data, train_data = load_patient_data(base_path)
+    Read all data for training patients from CSV files in the given directory.
     """
-    test_data = {}
     train_data = {}
-    
+
     for root, dirs, files in os.walk(base_path):
         for file in files:
-            if file.endswith(".csv"):
+            if file.endswith(".csv") and "_train" in file.lower():
                 file_path = os.path.join(root, file)
-                key = file.split("_")[0]  # Tant per train com test
+                key = file.split("_")[0]  # Assumeix que el nom del fitxer comença amb ID del pacient
 
                 try:
                     df = pd.read_csv(file_path, sep=';', header=None, decimal=",")
                     if df.shape[1] == len(column_names):
                         df.columns = column_names
-                        if "_test" in file.lower():     # Punt 3 aplicat aquí
-                            test_data[key] = df
-                        elif "_train" in file.lower():  # Punt 3 aplicat aquí
-                            train_data[key] = df
+                        train_data[key] = df
                     else:
                         print(f"[WARN] Columnes inesperades a {file_path}: {df.shape[1]} columnes")
                 except Exception as e:
                     print(f"[ERROR] Carregant {file_path}: {e}")
-    return test_data, train_data
+
+    return train_data
 
 
 

@@ -5,6 +5,11 @@ from tabulate import tabulate
 import pandas as pd
 from datetime import datetime
 from models.offline_model import train_and_evaluate_offline
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+# la resta de imports…
 
 # Mostra totes les columnes i amplia l'ample per consola
 pd.set_option('display.max_columns', None)
