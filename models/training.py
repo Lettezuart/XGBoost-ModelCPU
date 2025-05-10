@@ -22,8 +22,9 @@ def train_model(X_train, Y_train, X_test, Y_test):
         'subsample': [0.6, 0.8],
         'colsample_bytree': [0.6, 0.8],
         'min_child_weight': [1, 5, 10],
-        'gamma': [0, 0.1],
-        
+        # 'lambda': [1, 5, 10],        
+        # 'alpha': [0, 0.5, 1],        
+        'gamma': [0, 0.1],      
     }
 
 
@@ -33,7 +34,9 @@ def train_model(X_train, Y_train, X_test, Y_test):
         random_state=42,
         tree_method='hist',
         booster='gbtree',
-        n_jobs=-1
+        n_jobs=-1,
+        # device='gpu',
+
     )
 
     # GridSearchCV automàtic
