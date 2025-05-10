@@ -1,11 +1,18 @@
 {
-    "subsample": 0.6,
-    "reg_lambda": 0.1,
-    "reg_alpha": 1.5,
+    "tree_method": "hist",
+    "subsample": 0.1,
+    "scale_pos_weight": 1,
+    "reg_lambda": 1.55,
+    "reg_alpha": 5.0,
+    "objective": "reg:squarederror",
     "n_estimators": 200,
-    "min_child_weight": 10,
-    "max_depth": 3,
-    "learning_rate": 0.03,
-    "gamma": 0.25,
-    "colsample_bytree": 0.9
+    "min_child_weight": 1,
+    "max_depth": 5,
+    "max_delta_step": 0,
+    "max_bin": 256,
+    "learning_rate": 0.03162277660168379,
+    "gamma": 0.0,
+    "eval_metric": "rmse",
+    "colsample_bytree": 0.31622776601683794,
+    "booster": "gbtree"
 }

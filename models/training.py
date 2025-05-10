@@ -34,16 +34,24 @@ def xgbRegressor_model(X_train, Y_train, X_test, Y_test, Search: str = "auto"):
     }
 
     random_distribution = {
-        'n_estimators': np.arange(100, 500, 100),
-        'learning_rate': np.linspace(0.01, 0.2, 20),  # Més alt per accelerar l'aprenentatge
-        'max_depth': np.arange(3, 15),
-        'min_child_weight': [1, 3, 5, 10],
-        'subsample': np.linspace(0.5, 0.9, 5),  # Disminuir per augmentar l'aleatorietat
-        'colsample_bytree': np.linspace(0.5, 0.9, 5),
-        'gamma': np.linspace(0, 1, 5),  # Menys gamma per fer el model més flexible
-        'reg_alpha': np.linspace(0, 2, 5),  # Regularització L1 més alta
-        'reg_lambda': np.linspace(0.1, 1, 5),  # Regularització L2 més alta
+        'n_estimators': np.arange(100, 300, 100),  # Reduït a la meitat
+        'learning_rate': np.logspace(-3, -1, 5),  # Reduït a 5 punts
+        'max_depth': np.arange(5, 13),  # Reduït de 5 a 12
+        'min_child_weight': [0.5, 1, 3],  # Reduït a 3 valors
+        'subsample': np.logspace(-1, 0, 5),  # Reduït a 5 punts
+        'colsample_bytree': np.logspace(-1, 0, 5),  # Reduït a 5 punts
+        'gamma': np.linspace(0, 1, 3),  # Reduït a 3 punts
+        'reg_alpha': np.linspace(0, 5, 3),  # Reduït a 3 punts
+        'reg_lambda': np.linspace(0.1, 3, 3),  # Reduït a 3 punts
+        'max_delta_step': [0, 1],  # Reduït a 2 valors
+        'scale_pos_weight': [1, 2, 5],  # Reduït a 3 valors
+        'booster': ['gbtree'],  # Reduït a un sol valor
+        'objective': ['reg:squarederror'],  # Reduït a un sol valor
+        'tree_method': ['auto', 'hist'],  # Reduït a 2 valors
+        'eval_metric': ['rmse'],  # Reduït a un sol valor
+        'max_bin': [256, 512],  # Reduït a 2 valors
     }
+
 
 
     # Model base
@@ -52,7 +60,7 @@ def xgbRegressor_model(X_train, Y_train, X_test, Y_test, Search: str = "auto"):
         random_state=42,
         tree_method='hist',
         booster='gbtree',
-        n_jobs=-1,
+        n_jobs=10,
     )
 
     # Decidim el mètode de cerca
@@ -61,12 +69,12 @@ def xgbRegressor_model(X_train, Y_train, X_test, Y_test, Search: str = "auto"):
        search_method = RandomizedSearchCV(
             estimator=model,
             param_distributions=random_distribution,
-            n_iter=500,
+            n_iter=1000,
             scoring='neg_mean_squared_error',
             cv=5,  # Canviar de 3 a 5 per més folds
             verbose=1,
             random_state=42,
-            n_jobs=-1
+            n_jobs=10
         )
     elif Search == "auto":
         search_method = GridSearchCV(
@@ -149,7 +157,6 @@ def xgbTrain_model(X_train, Y_train, X_test, Y_test):
         'subsample': 0.8,
         'colsample_bytree': 0.8,
         'random_state': 42,
-
     }
 
     # Entrenament amb early stopping
@@ -159,7 +166,7 @@ def xgbTrain_model(X_train, Y_train, X_test, Y_test):
         num_boost_round=10000,  # nombre màxim d’iteracions
         evals=[(dtest, 'eval')],
         early_stopping_rounds=50,
-        verbose_eval=False,     
+        verbose_eval=False,  # ID de la GPU a utilitzar  
     )
 
     # Prediccions
