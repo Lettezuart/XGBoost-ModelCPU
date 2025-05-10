@@ -9,11 +9,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-# la resta de imports…
-
-# Mostra totes les columnes i amplia l'ample per consola
-pd.set_option('display.max_columns', None)
-pd.set_option('display.width', None)
 
 # Afegeix el path del projecte per importar mòduls
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))

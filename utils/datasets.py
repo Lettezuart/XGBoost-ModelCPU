@@ -26,9 +26,9 @@ def load_patient_data(base_path):
                         df.columns = column_names
                         train_data[key] = df
                     else:
-                        print(f"[WARN] Columnes inesperades a {file_path}: {df.shape[1]} columnes")
+                        print(f"[WARN] Unintended columns in {file_path}: {df.shape[1]} columns")
                 except Exception as e:
-                    print(f"[ERROR] Carregant {file_path}: {e}")
+                    print(f"[ERROR] Loading {file_path}: {e}")
 
     return train_data
 

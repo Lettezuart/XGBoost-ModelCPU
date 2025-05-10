@@ -58,8 +58,8 @@ def train_and_evaluate_offline(base_path):
             Y_test = df_test_shifted["glucose_target"]
 
             # Train the model and get predictions: use xgbTrain_model or xgbRegressor_model
-            # model, x_scaler, rmse, Y_pred = xgbTrain_model(X_train, Y_train, X_test, Y_test)
-            best_model, x_scaler, rmse, Y_pred = xgbRegressor_model(X_train, Y_train, X_test, Y_test, Search='random')
+            model, x_scaler, rmse, Y_pred = xgbTrain_model(X_train, Y_train, X_test, Y_test)
+            # best_model, x_scaler, rmse, Y_pred = xgbRegressor_model(X_train, Y_train, X_test, Y_test, Search='random')
             mae = mean_absolute_error(Y_test, Y_pred)
             r2 = r2_score(Y_test, Y_pred)
 

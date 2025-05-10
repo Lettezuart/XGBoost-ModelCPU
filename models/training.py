@@ -159,12 +159,15 @@ def xgbTrain_model(X_train, Y_train, X_test, Y_test):
         'random_state': 42,
     }
 
+    # 6. Crea watchlist per veure evolució del RMSE
+    watchlist = [(dtrain, "train"), (dtest, "eval")]
+
     # Entrenament amb early stopping
     model = xgb.train(
         params=params,
         dtrain=dtrain,
         num_boost_round=10000,  # nombre màxim d’iteracions
-        evals=[(dtest, 'eval')],
+        evals=watchlist,
         early_stopping_rounds=50,
         verbose_eval=False,  # ID de la GPU a utilitzar  
     )
