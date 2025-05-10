@@ -1,6 +1,6 @@
 from utils.datasets import load_patient_data
 from utils.data_processing import process_all_data
-from models.training import train_model
+from models.training import xgbTrain_model,xgbRegressor_model
 from utils.evaluation import plot_glucose_timeseries
 from utils.clarke import plot_clarke_error
 from utils.filter import apply_kalman_to_data
@@ -57,8 +57,9 @@ def train_and_evaluate_offline(base_path):
             X_test = df_test_shifted.drop(columns=["glucose_level", "glucose_target", "datetime"])
             Y_test = df_test_shifted["glucose_target"]
 
-            # Train the model and get predictions
-            model, x_scaler, rmse, Y_pred = train_model(X_train, Y_train, X_test, Y_test)
+            # Train the model and get predictions: use xgbTrain_model or xgbRegressor_model
+            # model, x_scaler, rmse, Y_pred = xgbTrain_model(X_train, Y_train, X_test, Y_test)
+            best_model, x_scaler, rmse, Y_pred = xgbRegressor_model(X_train, Y_train, X_test, Y_test, Search='random')
             mae = mean_absolute_error(Y_test, Y_pred)
             r2 = r2_score(Y_test, Y_pred)
 
