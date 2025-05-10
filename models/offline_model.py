@@ -1,6 +1,6 @@
 from utils.datasets import load_patient_data
 from utils.data_processing import process_all_data
-from models.training import xgbTrain_model,xgbRegressor_model
+from models.training import xgbTrain_model
 from utils.evaluation import plot_glucose_timeseries
 from utils.clarke import plot_clarke_error
 from utils.filter import apply_kalman_to_data
