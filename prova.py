@@ -1,12 +1,14 @@
 import pandas as pd
 import numpy as np
 import xgboost as xgb
+import shap
+import matplotlib.pyplot as plt
+import os
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import root_mean_squared_error
 
-# 1. Carrega les dades
+# 1. Load the dataset
 df = pd.read_csv("Data/Raw/591/591_train.csv", header=None, sep=';', decimal=",")
-  # Substitueix pel teu fitxer real
 column_names = [
     "year", "month", "day", "hour", "minute", "second", "glucose_level", "finger_stick", "basal", "bolus",
     "sleep", "work", "stressors", "hypo_event", "illness",
@@ -14,18 +16,19 @@ column_names = [
     "basis_air_temperature", "basis_step", "basis_sleep", "meal", "type_of_meal"
 ]
 df.columns = column_names
-# 2. Separa entrada i sortida
-X = df.drop(columns="glucose_level")  # Canvia 'target' pel nom correcte de la columna objectiu
-y = df["glucose_level"]  # Canvia 'target' pel nom correcte de la columna objectiu
 
-# 3. Divideix en train i test
+# 2. Split features and target
+X = df.drop(columns="glucose_level")
+y = df["glucose_level"]
+
+# 3. Split into train and test sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# 4. Converteix a DMatrix (entrenament amb GPU)
+# 4. Convert to DMatrix
 dtrain = xgb.DMatrix(X_train, label=y_train)
 dtest = xgb.DMatrix(X_test, label=y_test)
 
-# 5. Defineix paràmetres amb CUDA
+# 5. Define model parameters
 params = {
     "tree_method": "hist",
     "predictor": "gpu_predictor",
@@ -34,20 +37,47 @@ params = {
     "device": "cuda",
 }
 
-# 6. Crea watchlist per veure evolució del RMSE
+# 6. Set up watchlist
 watchlist = [(dtrain, "train"), (dtest, "eval")]
 
-# 7. Entrena
+# 7. Train the model
 model = xgb.train(
     params=params,
     dtrain=dtrain,
-    num_boost_round=100000000,
+    num_boost_round=10000,
     evals=watchlist,
     early_stopping_rounds=100,
     verbose_eval=True
 )
 
-# 8. Prediccions i mètrica
+# 8. Make predictions and evaluate
 y_pred = model.predict(dtest)
 rmse = root_mean_squared_error(y_test, y_pred)
-print(f"RMSE sobre el set de test: {rmse:.4f}")
+print(f"Test RMSE: {rmse:.4f}")
+
+# 9. SHAP - Feature importance visualization
+print("Generating SHAP visualizations...")
+
+# Create output folder if it doesn't exist
+output_dir = "Shap"
+os.makedirs(output_dir, exist_ok=True)
+
+# Initialize SHAP explainer and calculate SHAP values
+explainer = shap.Explainer(model, X_train)
+shap_values = explainer(X_test)
+
+# SHAP summary plot
+summary_plot_path = os.path.join(output_dir, "shap_summary_plot.png")
+shap.summary_plot(shap_values, X_test, show=False)
+plt.savefig(summary_plot_path, bbox_inches="tight")
+plt.clf()
+print(f"SHAP summary plot saved to: {summary_plot_path}")
+
+# SHAP bar plot
+bar_plot_path = os.path.join(output_dir, "shap_summary_bar_plot.png")
+shap.summary_plot(shap_values, X_test, plot_type="bar", show=False)
+plt.savefig(bar_plot_path, bbox_inches="tight")
+plt.clf()
+print(f"SHAP summary bar plot saved to: {bar_plot_path}")
+
+
