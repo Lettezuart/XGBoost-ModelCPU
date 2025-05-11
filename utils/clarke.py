@@ -147,10 +147,7 @@ def plot_clarke_error(y_true, y_pred, filename="clarke_plot.png", title="Clarke 
 
 
     # Guardar el gràfic
-    output_dir = "ResultatsTemporals/grafics_offline"
-    os.makedirs(output_dir, exist_ok=True)
-    full_path = os.path.join(output_dir, filename)
-    plt.savefig(full_path)
+    plt.savefig(filename, dpi=300)
     plt.close()
 
 

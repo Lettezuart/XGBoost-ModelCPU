@@ -44,7 +44,7 @@ def xgbTrain_model(X_train, Y_train, X_test, Y_test, patient_id, horizon):
     model = xgb.train(
         params=params,
         dtrain=dtrain,
-        num_boost_round=10,
+        num_boost_round=10000,
         evals=watchlist,
         early_stopping_rounds=50,
         verbose_eval=True,
