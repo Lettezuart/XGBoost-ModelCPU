@@ -9,7 +9,7 @@ from utils.data_loader import load_and_prepare_data
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-
+import shutil
 
 def shift_target(df, horizon):
     """Shifts glucose levels to predict 'horizon' minutes into the future"""
@@ -33,7 +33,15 @@ def train_and_evaluate_offline(base_path):
     }
 
     results = {30: {}, 60: {}}
-    output_dir = os.path.join("ResultatsTemporals", "grafics_offline")
+
+    output_dir = "Evaluation_results"
+
+    # Create output directory if it doesn't exist
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir, ignore_errors=True)
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Create output directories for each patient
     os.makedirs(output_dir, exist_ok=True)
 
     for patient_id, (df_train, df_test) in prepared_data.items():
@@ -57,40 +65,47 @@ def train_and_evaluate_offline(base_path):
             X_test = df_test_shifted.drop(columns=["glucose_level", "glucose_target", "datetime"])
             Y_test = df_test_shifted["glucose_target"]
 
-            # Train the model and get predictions: use xgbTrain_model or xgbRegressor_model
-            model, x_scaler, rmse, Y_pred = xgbTrain_model(X_train, Y_train, X_test, Y_test)
-            # best_model, x_scaler, rmse, Y_pred = xgbRegressor_model(X_train, Y_train, X_test, Y_test, Search='random')
-            mae = mean_absolute_error(Y_test, Y_pred)
-            r2 = r2_score(Y_test, Y_pred)
+            # Train the model and get predictions
+            model, x_scaler, rmse, mae, logloss, r2, Y_pred = xgbTrain_model(
+                X_train, Y_train, X_test, Y_test, patient_id, horizon
+            )
 
             print(f"✅ {patient_id} | Horizon {horizon} min → RMSE: {rmse:.2f} | MAE: {mae:.2f} | R²: {r2:.2f}")
-            results[horizon][patient_id] = {"rmse": rmse, "mae": mae, "r2": r2}
+            results[horizon][patient_id] = {
+                "rmse": rmse, "mae": mae, "logloss": logloss, "r2": r2
+            }
 
             # Generate and save plots
             datetimes = df_test_shifted["datetime"]
             timeseries_filename = os.path.join(output_dir, f"glucose_timeseries_{patient_id}_h{horizon}min.png")
-            plot_glucose_timeseries(Y_test, Y_pred, datetimes, patient_id, horizon, filename=timeseries_filename)
+            plot_glucose_timeseries(Y_test, Y_pred, df_test_shifted["datetime"], patient_id, horizon, filename=timeseries_filename)            
             print(f"📉 Time series saved at: {timeseries_filename}")
 
-            clarke_filename = f"clarke_{patient_id}_h{horizon}min.png"
+            clarke_filename = os.path.join(output_dir, f"clarke_{patient_id}_h{horizon}min.png")
             plot_clarke_error(Y_test, Y_pred, filename=clarke_filename)
-            print(f"📈 Clarke error saved at: {os.path.join(output_dir, clarke_filename)}")
+            print(f"📈 Clarke error saved at: {clarke_filename}")
 
     # Compute average metrics across all patients
     for horizon in [30, 60]:
         all_rmses = [v["rmse"] for v in results[horizon].values()]
         all_maes = [v["mae"] for v in results[horizon].values()]
+        all_loglosses = [v["logloss"] for v in results[horizon].values()]
         all_r2s = [v["r2"] for v in results[horizon].values()]
 
         avg_rmse = sum(all_rmses) / len(all_rmses)
         avg_mae = sum(all_maes) / len(all_maes)
+        avg_logloss = sum(all_loglosses) / len(all_loglosses)
         avg_r2 = sum(all_r2s) / len(all_r2s)
 
         print(f"\n📈 Results for horizon {horizon} minutes:")
         for pid, metrics in results[horizon].items():
-            print(f"  Patient {pid}: RMSE = {metrics['rmse']:.2f}, MAE = {metrics['mae']:.2f}, R² = {metrics['r2']:.2f}")
+            print(f"  Patient {pid}: RMSE = {metrics['rmse']:.2f}, MAE = {metrics['mae']:.2f}, LogLoss = {metrics['logloss']:.2f}, R² = {metrics['r2']:.2f}")
         print(f"  ➕ AVERAGE RMSE: {avg_rmse:.2f}")
         print(f"  ➕ AVERAGE MAE: {avg_mae:.2f}")
+        print(f"  ➕ AVERAGE LogLoss: {avg_logloss:.2f}")
         print(f"  ➕ AVERAGE R²: {avg_r2:.2f}")
 
     return results
+
+
+
