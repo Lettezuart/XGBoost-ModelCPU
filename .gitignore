@@ -4,4 +4,5 @@ __pycache__/
 Model_parameters/
 espaivirtual/
 outputs/
-Plots
+Plots/
+Evaluation_results/
