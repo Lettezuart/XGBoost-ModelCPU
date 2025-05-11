@@ -5,6 +5,7 @@ from tabulate import tabulate
 import pandas as pd
 from datetime import datetime
 from models.offline_model import train_and_evaluate_offline
+from utils.final_validation import final_validation_test
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -25,13 +26,10 @@ def main():
         row = [
             pid,
             results[30][pid]["rmse"],
-            results[30][pid]["mse"],
             results[30][pid]["mae"],
-            results[30][pid]["logloss"],
             results[30][pid]["r2"],
             results[60][pid]["rmse"],
             results[60][pid]["mae"],
-            results[60][pid]["logloss"],
             results[60][pid]["r2"]
         ]
         table.append(row)
@@ -41,17 +39,16 @@ def main():
     for horizon in [30, 60]:
         avg_rmse = sum(r["rmse"] for r in results[horizon].values()) / len(patient_ids)
         avg_mae = sum(r["mae"] for r in results[horizon].values()) / len(patient_ids)
-        avg_logloss = sum(r["logloss"] for r in results[horizon].values()) / len(patient_ids)
         avg_r2 = sum(r["r2"] for r in results[horizon].values()) / len(patient_ids)
         
-        avg_row.extend([avg_rmse, avg_mae, avg_logloss, avg_r2])
+        avg_row.extend([avg_rmse, avg_mae, avg_r2])
     table.append(avg_row)
 
     # Definir les capçaleres amb totes les mètriques
     headers = [
         "Pacient ID", 
-        "RMSE 30", "MAE 30", "LogLoss 30", "R² 30",
-        "RMSE 60", "MAE 60", "LogLoss 60", "R² 60"
+        "RMSE 30", "MAE 30", "R² 30",
+        "RMSE 60", "MAE 60", "R² 60"
     ]
 
     # Generar la taula com a string

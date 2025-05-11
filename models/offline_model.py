@@ -66,13 +66,13 @@ def train_and_evaluate_offline(base_path):
             Y_test = df_test_shifted["glucose_target"]
 
             # Train the model and get predictions
-            model, x_scaler, rmse, mae, logloss, r2, Y_pred = xgbTrain_model(
+            model, x_scaler, rmse, mae, r2, Y_pred = xgbTrain_model(
                 X_train, Y_train, X_test, Y_test, patient_id, horizon
             )
 
             print(f"✅ {patient_id} | Horizon {horizon} min → RMSE: {rmse:.2f} | MAE: {mae:.2f} | R²: {r2:.2f}")
             results[horizon][patient_id] = {
-                "rmse": rmse, "mae": mae, "logloss": logloss, "r2": r2
+                "rmse": rmse, "mae": mae, "r2": r2
             }
 
             # Generate and save plots
@@ -89,12 +89,10 @@ def train_and_evaluate_offline(base_path):
     for horizon in [30, 60]:
         all_rmses = [v["rmse"] for v in results[horizon].values()]
         all_maes = [v["mae"] for v in results[horizon].values()]
-        all_loglosses = [v["logloss"] for v in results[horizon].values()]
         all_r2s = [v["r2"] for v in results[horizon].values()]
 
         avg_rmse = sum(all_rmses) / len(all_rmses)
         avg_mae = sum(all_maes) / len(all_maes)
-        avg_logloss = sum(all_loglosses) / len(all_loglosses)
         avg_r2 = sum(all_r2s) / len(all_r2s)
 
         print(f"\n📈 Results for horizon {horizon} minutes:")
@@ -102,7 +100,6 @@ def train_and_evaluate_offline(base_path):
             print(f"  Patient {pid}: RMSE = {metrics['rmse']:.2f}, MAE = {metrics['mae']:.2f}, LogLoss = {metrics['logloss']:.2f}, R² = {metrics['r2']:.2f}")
         print(f"  ➕ AVERAGE RMSE: {avg_rmse:.2f}")
         print(f"  ➕ AVERAGE MAE: {avg_mae:.2f}")
-        print(f"  ➕ AVERAGE LogLoss: {avg_logloss:.2f}")
         print(f"  ➕ AVERAGE R²: {avg_r2:.2f}")
 
     return results
