@@ -5,7 +5,7 @@ from tabulate import tabulate
 import pandas as pd
 from datetime import datetime
 from models.offline_model import train_and_evaluate_offline
-from utils.final_validation import final_validation_test
+# from utils.final_validation import final_validation_test
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt

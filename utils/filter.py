@@ -1,7 +1,7 @@
 import numpy as np
 from filterpy.kalman import KalmanFilter
 
-def apply_kalman_to_data(df):
+def apply_kalman_to_data(df, patient_id=None):
     """
     Apply Kalman filter to the glucose level (equal to 0) data in the DataFrame.
     """
@@ -21,18 +21,23 @@ def apply_kalman_to_data(df):
     kalman_filter = KalmanFilter(dim_x=1, dim_z=1)
     
     # Initialize the state vector
-    kalman_filter.x = np.array([0])  # Estimació inicial
-    kalman_filter.P *= 1000  # Covariància inicial gran per la incertesa
+    kalman_filter.x = np.array([0])  # Initial estimate
+    kalman_filter.P *= 1000  # Initial large uncertainty
 
     # Define the state transition matrix
-    kalman_filter.F = np.array([[1]])  # La dinàmica del sistema (assumim que és una constant)
-    kalman_filter.H = np.array([[1]])  # Observació (la glucosa mesurada)
+    kalman_filter.F = np.array([[1]])  # System dynamics (assumed to be constant)
+    kalman_filter.H = np.array([[1]])  # Observation (measured glucose)
 
     # Define the measurement noise covariance
-    kalman_filter.R = np.array([[1]])  # Soroll de mesura (potser hauríem de ajustar-ho)
+    kalman_filter.R = np.array([[1]])  # Measurement noise (may need adjustment)
 
     # Define the process noise covariance
-    kalman_filter.Q = np.array([[0.1]])  # Soroll del procés
+    kalman_filter.Q = np.array([[0.1]])  # Process noise
+
+    # Special treatment for patient 591
+    if patient_id == 591:
+        kalman_filter.R = np.array([[0.1]])  # Reduce measurement noise
+        kalman_filter.Q = np.array([[0.5]])  # Increase process noise for smoother transitions
 
     for idx in df_filtered[zero_glucose_mask].index:
         # If the previous value is not available, use 0
@@ -57,7 +62,7 @@ def apply_kalman_to_all_data(prepared_data):
     """
     filtered = {}
     for patient_id, (df_train, df_test) in prepared_data.items():
-        df_train_filtered = apply_kalman_to_data(df_train)
+        df_train_filtered = apply_kalman_to_data(df_train, patient_id)
         # leave df_test untouched
         filtered[patient_id] = (df_train_filtered, df_test)
     return filtered

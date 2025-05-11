@@ -91,7 +91,6 @@ def xgbTrain_model(X_train, Y_train, X_test, Y_test, patient_id, horizon):
         "rmse_eval":  rmse,
         "mae_train":  evals_result['train']['mae'][-1],
         "mae_eval":   mae,
-        "logloss_train": evals_result['train']['logloss'][-1],
         "r2_eval":      r2,
         "num_boost_round": model.best_iteration,
         "model_path":     model_path,

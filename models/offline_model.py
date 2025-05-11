@@ -97,7 +97,7 @@ def train_and_evaluate_offline(base_path):
 
         print(f"\n📈 Results for horizon {horizon} minutes:")
         for pid, metrics in results[horizon].items():
-            print(f"  Patient {pid}: RMSE = {metrics['rmse']:.2f}, MAE = {metrics['mae']:.2f}, LogLoss = {metrics['logloss']:.2f}, R² = {metrics['r2']:.2f}")
+            print(f"  Patient {pid}: RMSE = {metrics['rmse']:.2f}, MAE = {metrics['mae']:.2f}, R² = {metrics['r2']:.2f}")
         print(f"  ➕ AVERAGE RMSE: {avg_rmse:.2f}")
         print(f"  ➕ AVERAGE MAE: {avg_mae:.2f}")
         print(f"  ➕ AVERAGE R²: {avg_r2:.2f}")
