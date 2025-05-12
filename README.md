@@ -2,7 +2,7 @@
 
 This project aims to predict glucose levels in patients based on time-series data using machine learning models. The project includes a complete pipeline, from data preprocessing to final validation, and prediction using XGBoost.
 
-## 💻 Requirements
+## Requirements
 
 To use this project, you will need the following packages and tools:
 
@@ -46,7 +46,7 @@ The project follows a pipeline with several stages:
    - All results (training and final validation) are printed to the console and saved in `.txt` files.
    - Tables include metrics for each patient and horizon, along with average results.
 
-## 🔄 **Detailed Pipeline**
+## **Detailed Pipeline**
 
 1. **Data Preprocessing**:
    - Raw data is loaded from `data/raw`.
@@ -66,7 +66,7 @@ The project follows a pipeline with several stages:
    - Glucose time-series prediction graphs and Clarke error plots are saved in the `Validation_plots` directory.
 
 
-## 📊 **Generated Outputs**
+## **Generated Outputs**
 
 The outputs of the project include:
 
@@ -91,7 +91,7 @@ The outputs of the project include:
 3. **Model Files**:
    - **`.json` and `.pkl` Files**: The trained models and scalers are saved in a specific directory (`Trained_model_outputs`) for each patient and horizon.
 
-## 📌 **How to Use the Project**
+## **How to Use the Project**
 
 1. **Training**:
    To train the models offline and generate results, run the following command:
