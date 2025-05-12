@@ -65,31 +65,6 @@ The project follows a pipeline with several stages:
    - Results tables with metrics for each patient are saved to `.txt` files in the `Training_metrics` (for training) and `Validation_metrics` (for final validation) directories.
    - Glucose time-series prediction graphs and Clarke error plots are saved in the `Validation_plots` directory.
 
-## 📂 **Folder Structure**
-
-The project follows this folder structure:
-
-```
-project/
-│
-├── data/
-│   └── raw/                     # Raw data files of patients
-│
-├── models/
-│   └── offline_model.py          # Code for offline model training
-│
-├── utils/
-│   ├── final_validation.py      # Functions for final validation
-│   ├── filter.py                # Functions for Kalman and EMA filtering
-│   ├── evaluation.py            # Functions for generating validation plots
-│   ├── clarke.py                # Functions for generating Clarke errors
-│   └── data_loader.py           # Functions for loading and preparing data
-│
-├── Training_metrics/            # Training results
-├── Validation_metrics/          # Final validation results
-├── Validation_plots/            # Validation plots
-└── main.py                      # Main script to execute the entire pipeline
-```
 
 ## 📊 **Generated Outputs**
 
