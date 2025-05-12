@@ -9,28 +9,6 @@ def apply_kalman_to_data(df, patient_id=None):
     df_filtered = df.copy()
     values = df_filtered["glucose_level"].astype(float).to_numpy()
 
-    if patient_id == 591:
-        # --- Dynamic AR extrapolation ---
-        max_p = 5
-        zero_positions = np.where(values == 0)[0]
-        for pos in zero_positions:
-            prev = []
-            j = pos - 1
-            while j >= 0 and len(prev) < max_p:
-                if values[j] != 0:
-                    prev.append((j, values[j]))
-                j -= 1
-            if len(prev) < 2:
-                values[pos] = prev[0][1] if prev else 120.0
-            else:
-                idxs, ys = zip(*prev)
-                x = np.array([pos - idx for idx in idxs])
-                y = np.array(ys)
-                coef = np.polyfit(x, y, 1)
-                values[pos] = np.polyval(coef, 0)
-        df_filtered["glucose_level"] = values
-        return df_filtered
-
     # --- Standard Kalman filter ---
     kf = KalmanFilter(dim_x=1, dim_z=1)
 
