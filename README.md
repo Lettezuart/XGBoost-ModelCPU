@@ -24,7 +24,7 @@ Dependencies can be installed using `pip` with the following command:
 pip install -r requirements.txt
 ```
 
-## 🛠 How the Project Works
+## How the Project Works
 
 The project follows a pipeline with several stages:
 
