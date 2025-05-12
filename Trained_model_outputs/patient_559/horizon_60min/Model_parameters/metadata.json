@@ -1,0 +1,28 @@
+{
+    "rmse_train": 30.736803047393824,
+    "rmse_eval": 42.670363081628814,
+    "mae_train": 22.947075870878237,
+    "mae_eval": 30.876246636721795,
+    "r2_eval": 0.6543368732105761,
+    "num_boost_round": 1464,
+    "model_path": "Trained_model_outputs\\patient_559\\horizon_60min\\Model_parameters\\model_param.json",
+    "scaler_path": "Trained_model_outputs\\patient_559\\horizon_60min\\Model_parameters\\scaler.pkl",
+    "params": {
+        "tree_method": "hist",
+        "objective": "reg:squarederror",
+        "eval_metric": [
+            "rmse",
+            "mae"
+        ],
+        "device": "cuda",
+        "learning_rate": 0.003,
+        "max_depth": 6,
+        "min_child_weight": 1,
+        "gamma": 0.1,
+        "subsample": 0.8,
+        "colsample_bytree": 0.6,
+        "lambda": 1,
+        "alpha": 0.2,
+        "random_state": 42
+    }
+}

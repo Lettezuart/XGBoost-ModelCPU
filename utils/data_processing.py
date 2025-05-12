@@ -8,7 +8,7 @@ def process_all_data(train_data):
     processed_train_data = {}
     
     for patient_id, df in train_data.items():
-        df = add_all_features(df)  # Aplica totes les transformacions
+        df = add_all_features(df)  
         processed_train_data[patient_id] = df
 
     return processed_train_data

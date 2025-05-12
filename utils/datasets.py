@@ -18,7 +18,7 @@ def load_patient_data(base_path):
         for file in files:
             if file.endswith(".csv") and "_train" in file.lower():
                 file_path = os.path.join(root, file)
-                key = file.split("_")[0]  # Assumeix que el nom del fitxer comença amb ID del pacient
+                key = file.split("_")[0]  
 
                 try:
                     df = pd.read_csv(file_path, sep=';', header=None, decimal=",")
@@ -33,4 +33,26 @@ def load_patient_data(base_path):
     return train_data
 
 
+def load_patient_data_test(base_path):
+    """
+    Read all data for training patients from CSV files in the given directory.
+    """
+    test_data = {}
 
+    for root, dirs, files in os.walk(base_path):
+        for file in files:
+            if file.endswith(".csv") and "_test" in file.lower():
+                file_path = os.path.join(root, file)
+                key = file.split("_")[0]  
+
+                try:
+                    df = pd.read_csv(file_path, sep=';', header=None, decimal=",")
+                    if df.shape[1] == len(column_names):
+                        df.columns = column_names
+                        test_data[key] = df
+                    else:
+                        print(f"[WARN] Unintended columns in {file_path}: {df.shape[1]} columns")
+                except Exception as e:
+                    print(f"[ERROR] Loading {file_path}: {e}")
+
+    return test_data

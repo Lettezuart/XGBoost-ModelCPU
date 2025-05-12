@@ -34,7 +34,7 @@ def train_and_evaluate_offline(base_path):
 
     results = {30: {}, 60: {}}
 
-    output_dir = "Evaluation_results"
+    output_dir = "Training_plots"
 
     # Create output directory if it doesn't exist
     if os.path.exists(output_dir):

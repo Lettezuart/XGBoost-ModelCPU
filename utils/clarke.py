@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 import os
 from sklearn.metrics import r2_score, mean_absolute_error
 
-# Funció per calcular el RMSE específic de glucosa (gRMSE)
+# Calculate Glucose RMSE
 def glucose_rmse(act_vals, pred_vals):
     mse = mean_squared_error(act_vals, pred_vals)
     rmse = np.sqrt(mse)
     return rmse
 
-# Càlcul de l'R²
+# Calculate R²
 def r2_score_custom(y_true, y_pred):
     """
     Calculate R² score between the actual and predicted values.
@@ -51,10 +51,10 @@ def clarke_error_zone_detailed(act, pred):
     # Zone B - lower
     return 1
 
-# Vectoritzar les funcions per l'eficiència
+# Vectorize the Clarke Error Grid function
 clarke_error_zone_detailed = np.vectorize(clarke_error_zone_detailed)
 
-# Funció per calcular les zones d'accuracy
+# Calculate the accuracy of each zone
 def zone_accuracy(act_arr, pred_arr, detailed=False, diabetes_type=1):
     """
     Calculates the average percentage of each zone based on Clarke
@@ -77,50 +77,50 @@ def zone_accuracy(act_arr, pred_arr, detailed=False, diabetes_type=1):
 def plot_clarke_error(y_true, y_pred, filename="clarke_plot.png", title="Clarke Error Grid"):
     from sklearn.metrics import mean_absolute_error
 
-    # Calcular zones detallades
+    # Calculate the Clarke Error Grid zones
     zones = clarke_error_zone_detailed(y_true, y_pred)
 
-    # Definir colors i etiquetes per zona (detallades)
+    # Define colors and labels for each zone
     zone_colors = ['green', 'orange', 'orange', 'red', 'red', 'purple', 'purple', 'black', 'black']
     zone_labels = ['A', 'B', 'B', 'C', 'C', 'D', 'D', 'E', 'E']
 
     plt.figure(figsize=(8, 8))
 
-    # Pintar els punts segons la zona
+    # Add color for each zone
     for z in range(9):
         idx = zones == z
         if np.any(idx):
             plt.scatter(y_true[idx], y_pred[idx], color=zone_colors[z], label=f"Zone {zone_labels[z]}", alpha=0.8, s=10)
 
-    # Dibuixar línia ideal i ±20%
+    # Draw the ideal line
     x = np.linspace(0, 400, 1000)
     plt.plot(x, x, 'k--', linewidth=1, label="Ideal")
     plt.plot(x, 1.2 * x, 'g--', linewidth=0.8)
     plt.plot(x, 0.8 * x, 'g--', linewidth=0.8)
 
-    # Línies de referència
+    # References lines
     for val in [70, 180, 240, 290]:
         plt.axhline(val, color='gray', linestyle=':', linewidth=0.5)
         plt.axvline(val, color='gray', linestyle=':', linewidth=0.5)
 
     plt.xlim(0, 400)
     plt.ylim(0, 400)
-    plt.xlabel("Glucosa real (mg/dL)")
-    plt.ylabel("Glucosa predita (mg/dL)")
+    plt.xlabel("Real Glucose (mg/dL)")
+    plt.ylabel("Predicted Glucose (mg/dL)")
     plt.title(title)
     plt.legend(loc="upper left", fontsize=10, title="Zones", title_fontsize='13', frameon=True, shadow=True, fancybox=True)
     plt.grid(False)
     plt.tight_layout()
 
-    # Calcular mètriques
+    # Calculate metrics
     rmse = glucose_rmse(y_true, y_pred)
     mae = mean_absolute_error(y_true, y_pred)
     r2 = r2_score_custom(y_true, y_pred)
 
-    # Accuracy de zones detallades
+    # Accuracy of each zone
     acc = zone_accuracy(y_true, y_pred, detailed=True)
 
-    # Combinar zones amb la mateixa lletra
+    # Combine zones
     zone_summary = {
         'A': acc[0],
         'B': acc[1] + acc[2],
@@ -129,14 +129,14 @@ def plot_clarke_error(y_true, y_pred, filename="clarke_plot.png", title="Clarke 
         'E': acc[7] + acc[8]
     }
 
-    # Preparar text
+    # Preparo text for the plot
     textstr = f"RMSE: {rmse:.2f}\nMAE: {mae:.2f}\nR²: {r2:.2f}"
     for label, value in zone_summary.items():
-        textstr += f"\nZona {label}: {value*100:.1f}%"
+        textstr += f"\nZone {label}: {value*100:.1f}%"
 
-    # Mostrar el text sota el títol
+    # Show the text in the plot
     plt.text(
-        0.2, 0.98,  # X molt proper a l'esquerra, Y a dalt
+        0.2, 0.98,  
         textstr,
         transform=plt.gca().transAxes,
         fontsize=11,
@@ -146,7 +146,7 @@ def plot_clarke_error(y_true, y_pred, filename="clarke_plot.png", title="Clarke 
     )
 
 
-    # Guardar el gràfic
+    # Save plot
     plt.savefig(filename, dpi=300)
     plt.close()
 

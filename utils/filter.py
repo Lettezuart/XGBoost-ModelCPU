@@ -3,66 +3,69 @@ from filterpy.kalman import KalmanFilter
 
 def apply_kalman_to_data(df, patient_id=None):
     """
-    Apply Kalman filter to the glucose level (equal to 0) data in the DataFrame.
+    Apply Kalman filter to the glucose_level column (zeros) in the DataFrame.
+    For patient 591, apply AR extrapolation. For others, use causal Kalman.
     """
     df_filtered = df.copy()
+    values = df_filtered["glucose_level"].astype(float).to_numpy()
 
-    # Make sure the glucose_level column is numeric
-    df_filtered["glucose_level"] = df_filtered["glucose_level"].astype(float)
-
-    # Identify rows where glucose_level is 0
-    zero_glucose_mask = df_filtered["glucose_level"] == 0
-
-    # If there are no zero glucose values, return the original DataFrame
-    if not zero_glucose_mask.any():
+    if patient_id == 591:
+        # --- Dynamic AR extrapolation ---
+        max_p = 5
+        zero_positions = np.where(values == 0)[0]
+        for pos in zero_positions:
+            prev = []
+            j = pos - 1
+            while j >= 0 and len(prev) < max_p:
+                if values[j] != 0:
+                    prev.append((j, values[j]))
+                j -= 1
+            if len(prev) < 2:
+                values[pos] = prev[0][1] if prev else 120.0
+            else:
+                idxs, ys = zip(*prev)
+                x = np.array([pos - idx for idx in idxs])
+                y = np.array(ys)
+                coef = np.polyfit(x, y, 1)
+                values[pos] = np.polyval(coef, 0)
+        df_filtered["glucose_level"] = values
         return df_filtered
 
-    # Define the Kalman filter
-    kalman_filter = KalmanFilter(dim_x=1, dim_z=1)
-    
-    # Initialize the state vector
-    kalman_filter.x = np.array([0])  # Initial estimate
-    kalman_filter.P *= 1000  # Initial large uncertainty
+    # --- Standard Kalman filter ---
+    kf = KalmanFilter(dim_x=1, dim_z=1)
 
-    # Define the state transition matrix
-    kalman_filter.F = np.array([[1]])  # System dynamics (assumed to be constant)
-    kalman_filter.H = np.array([[1]])  # Observation (measured glucose)
+    # Estimar estat inicial com el primer valor no-zero
+    nonzero_start = next((v for v in values if v != 0), 120.0)
+    kf.x = np.array([nonzero_start])
+    kf.P *= 100.0
+    kf.F = np.array([[1.0]])
+    kf.H = np.array([[1.0]])
+    kf.R = np.array([[1.0]])
+    kf.Q = np.array([[0.1]])
 
-    # Define the measurement noise covariance
-    kalman_filter.R = np.array([[1]])  # Measurement noise (may need adjustment)
+    # Aplicar Kalman pas a pas
+    for i in range(len(values)):
+        if values[i] == 0:
+            kf.predict()
+            values[i] = float(kf.x)
+        else:
+            kf.predict()
+            kf.update([values[i]])
 
-    # Define the process noise covariance
-    kalman_filter.Q = np.array([[0.1]])  # Process noise
+        # Clamp (opcional, per evitar valors negatius o bojos)
+        values[i] = max(0.0, min(values[i], 400.0))
 
-    # Special treatment for patient 591
-    if patient_id == 591:
-        kalman_filter.R = np.array([[0.1]])  # Reduce measurement noise
-        kalman_filter.Q = np.array([[0.5]])  # Increase process noise for smoother transitions
-
-    for idx in df_filtered[zero_glucose_mask].index:
-        # If the previous value is not available, use 0
-        prev_value = df_filtered.loc[idx-1, "glucose_level"] if idx > 0 else 0
-        
-        # Define the measurement
-        measurement = np.array([prev_value])
-
-        # Actualize the Kalman filter with the measurement
-        kalman_filter.predict()
-        kalman_filter.update(measurement)
-
-        # Update the DataFrame with the filtered value
-        df_filtered.loc[idx, "glucose_level"] = kalman_filter.x[0]
-
+    df_filtered["glucose_level"] = values
     return df_filtered
+
 
 def apply_kalman_to_all_data(prepared_data):
     """
-    Given a dict {patient: (df_train, df_test)}, apply the Kalman filter
-    only to the df_train part, and return the same structure.
+    Given a dict {patient_id: (df_train, df_test)},
+    apply the filter only to df_train and return the same structure.
     """
     filtered = {}
-    for patient_id, (df_train, df_test) in prepared_data.items():
-        df_train_filtered = apply_kalman_to_data(df_train, patient_id)
-        # leave df_test untouched
-        filtered[patient_id] = (df_train_filtered, df_test)
+    for pid, (df_tr, df_te) in prepared_data.items():
+        df_tr_filt = apply_kalman_to_data(df_tr, pid)
+        filtered[pid] = (df_tr_filt, df_te)
     return filtered

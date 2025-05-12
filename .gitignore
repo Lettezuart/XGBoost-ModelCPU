@@ -1,9 +1,6 @@
-Shap/
-__pycache__/
-Model_parameters/
-espaivirtual/
-outputs/
-Plots/
-Evaluation_results/
-Model_parameters/
-resum_zeros_col7.txt
+ Trained_model_outputs/
+ Training_metrics/
+ Training_plots/
+ Validation_metrics/
+ Validation_plots/
+ prova.py
