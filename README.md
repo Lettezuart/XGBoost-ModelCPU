@@ -6,7 +6,8 @@ This project aims to predict glucose levels in patients based on time-series dat
 
 To use this project, you will need the following packages and tools:
 
-- **Python 3.x** 
+- **Python 3.x**
+- **Cuda from Nvidia**
 - **Libraries**:
   - `pandas`
   - `numpy`
