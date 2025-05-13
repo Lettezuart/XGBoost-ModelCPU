@@ -57,7 +57,7 @@ flowchart TD
     Main -->|"orchestrates pipeline"| FV
     Main -->|"orchestrates pipeline"| CL
 
-    click DS "https://github.com/lettezuart/xgboost-modelgpu/tree/OnlyGPU/Data/Raw/<patient_id>"
+    click DS "https://github.com/lettezuart/xgboost-modelgpu/tree/OnlyGPU/Data/Raw"
     click DL "https://github.com/lettezuart/xgboost-modelgpu/blob/OnlyGPU/utils/data_loader.py"
     click DP "https://github.com/lettezuart/xgboost-modelgpu/blob/OnlyGPU/utils/data_processing.py"
     click FT "https://github.com/lettezuart/xgboost-modelgpu/blob/OnlyGPU/utils/features.py"
